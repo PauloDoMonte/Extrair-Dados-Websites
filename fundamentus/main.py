@@ -49,6 +49,15 @@ for i in qtd:
     acoes['Cotacao'] = cotacao
     acoes['PL'] = PL
     acoes['PVP'] = PVP
+    acoes['PSR'] = PSR
+    acoes['DividendYield'] = DividendYield
+    acoes['PAtivo'] = PAtivo
+    acoes['PCapGiro'] = PCapGiro
+    acoes['PEbit'] = PEbit
+    acoes['PAtivoCirc'] = PAtivoCirc
+    acoes['EVEbit'] = EVEbit
+    acoes['EVEbita'] = EVEbita
+    acoes['MrgEbit'] = MrgEbit
 
     resumo.append(acoes)
 
@@ -61,3 +70,35 @@ for i in qtd:
 
 database = pd.DataFrame(resumo)
 print(database.head())
+
+# Tratamento de dados campo PL
+database['PL'] = database['PL'].str.replace('.','',regex=True).replace(',','.',regex=True)
+convert_dict = {'PL':float}
+database['PL'] = database['PL'].astype(convert_dict)
+
+# Tratamento de dados campo ROE
+database['ROE'] = database['ROE'].str.replace('.','',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
+convert_dict = {'ROE': float}
+database['ROE'] = database['ROE'].astype(convert_dict)/100
+
+# Tratamento de dados campo MrgLiq
+database['MrgLiq'] = database['MrgLiq'].str.replace('.','',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
+convert_dict = {'MrgLiq': float}
+database['MrgLiq'] = database['MrgLiq'].astype(convert_dict)/100
+
+# Tratamento de dados campo Divida Bruta/Patrimonio
+database['DivBruta_por_Patri'] = database['DivBruta_por_Patri'].str.replace('.','',regex=True).replace(',','.',regex=True)
+convert_dict = {'DivBruta_por_Patri': float}
+database['DivBruta_por_Patri'] = database['DivBruta_por_Patri'].astype(convert_dict)
+
+# Tratamento de dados campo CAGER
+database['Cresc_5a'] = database['Cresc_5a'].str.replace('.',',',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
+convert_dict = {'Cresc_5a': float}
+database['Cresc_5a'] = database['Cresc_5a'].astype(convert_dict)/100
+
+# Tratamento de dados campo DividendYield
+database['DividendYield'] = database['DividendYield'].str.replace('.','',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
+convert_dict = {'DividendYield':float}
+database['DividendYield'] = database['DividendYield'].astype(convert_dict)/100
+
+# Tratamento de dados campo ROIC
