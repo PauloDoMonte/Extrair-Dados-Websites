@@ -58,6 +58,14 @@ for i in qtd:
     acoes['EVEbit'] = EVEbit
     acoes['EVEbita'] = EVEbita
     acoes['MrgEbit'] = MrgEbit
+    acoes['MrgLiq'] = MrgLiq
+    acoes['LiqCorrente'] = LiqCorrente
+    acoes['ROIC'] = ROIC
+    acoes['ROE'] = ROE
+    acoes['Liq2Meses'] = Liq2Meses
+    acoes['PatriLiquido'] = PatriLiquido
+    acoes['DivBruta_por_Patri'] = DivBruta_por_Patri
+    acoes['Cresc_5a'] = Cresc_5a
 
     resumo.append(acoes)
 
@@ -69,7 +77,6 @@ for i in qtd:
         print(e.status, e.reason)
 
 database = pd.DataFrame(resumo)
-print(database.head())
 
 # Tratamento de dados campo PL
 database['PL'] = database['PL'].str.replace('.','',regex=True).replace(',','.',regex=True)
@@ -92,7 +99,7 @@ convert_dict = {'DivBruta_por_Patri': float}
 database['DivBruta_por_Patri'] = database['DivBruta_por_Patri'].astype(convert_dict)
 
 # Tratamento de dados campo CAGER
-database['Cresc_5a'] = database['Cresc_5a'].str.replace('.',',',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
+database['Cresc_5a'] = database['Cresc_5a'].str.replace('.','',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
 convert_dict = {'Cresc_5a': float}
 database['Cresc_5a'] = database['Cresc_5a'].astype(convert_dict)/100
 
@@ -102,3 +109,46 @@ convert_dict = {'DividendYield':float}
 database['DividendYield'] = database['DividendYield'].astype(convert_dict)/100
 
 # Tratamento de dados campo ROIC
+database['ROIC'] = database['ROIC'].str.replace('.','',regex=True).replace(',','.',regex=True).replace('%','',regex=True)
+convert_dict = {'ROIC': float}
+database['ROIC'] = database['ROIC'].astype(convert_dict)/100
+
+# Tratamento de dados campo PVP
+database['PVP'] = database['PVP'].str.replace('.','',regex=True).replace(',','.',regex=True)
+convert_dict = {'PVP': float}
+database['PVP'] = database['PVP'].astype(convert_dict)
+
+# Tratamento de dados campo EVEbit
+database['EVEbit'] = database['EVEbit'].str.replace('.','',regex=True).replace(',','.',regex=True)
+convert_dict = {'EVEbit': float}
+database['EVEbit'] = database['EVEbit'].astype(convert_dict)
+
+# Tratamento de dados campo EVEbita
+database['EVEbita'] = database['EVEbita'].str.replace('.','',regex=True).replace(',','.',regex=True)
+convert_dict = {'EVEbita': float}
+database['EVEbita'] = database['EVEbita'].astype(convert_dict)
+
+# Filtragem de dados para selecionar as melhores acoes
+selecao = (database['PL'] >= 1) & (database['ROE'] > 0) & (database['ROE'] < 90) & (database['MrgLiq'] > 0) & (database['DivBruta_por_Patri']>1.3) & (database['Cresc_5a']>0.1)
+
+melhores_acoes = database[selecao].sort_values('PL',ascending=False)
+melhores_acoes.to_csv("melhores_acoes.csv")
+
+# Visualização com gráficos
+import matplotlib.pyplot as plt
+
+plt.rc('figure',figsize=(30,10))
+plt.rc('font',family='serif',size=8)
+area = plt.figure()
+
+dados_g1 = melhores_acoes.sort_values(by='PL', ascending=False)
+plt.barh(dados_g1.Papel,dados_g1.PL)
+plt.title('PL por ação')
+plt.show()
+
+dados_g2 = melhores_acoes.sort_values(by='PVP', ascending=False)
+plt.barh(dados_g2.Papel,dados_g1.PVP)
+plt.title('PVP por ação')
+plt.show()
+
+area
